@@ -20,14 +20,26 @@ const createStorage = (folder) => {
   });
 };
 
+const fileFilter = (allowedMimes) => {
+  return (req, file, cb) => {
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error(`Invalid file type. Expected: ${allowedMimes.join(", ")}`), false);
+    }
+  };
+};
+
 const resumeUpload = multer({
   storage: createStorage("resumes"),
   limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: fileFilter(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']),
 });
 
 const profileUpload = multer({
   storage: createStorage("profiles"),
   limits: { fileSize: 3 * 1024 * 1024 },
+  fileFilter: fileFilter(['image/jpeg', 'image/png', 'image/gif', 'image/webp']),
 });
 
 module.exports = {

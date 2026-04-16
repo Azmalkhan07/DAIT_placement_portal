@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { protect } = require("../middleware/authMiddleware");
 
 const {
   getTestReports,
@@ -8,9 +9,9 @@ const {
   deleteTestReport,
 } = require("../controllers/testReportController");
 
-router.get("/", getTestReports);
-router.post("/", addTestReport);
-router.put("/:id", updateTestReport);
-router.delete("/:id", deleteTestReport);
+router.get("/", protect, getTestReports);
+router.post("/", protect, addTestReport);
+router.put("/:id", protect, updateTestReport);
+router.delete("/:id", protect, deleteTestReport);
 
 module.exports = router;

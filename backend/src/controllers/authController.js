@@ -55,6 +55,7 @@ const loginUser = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Error logging in:", error);
     res.status(500).json({
       success: false,
       message: "Login failed",
@@ -106,6 +107,7 @@ const registerUser = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Error registering user:", error);
     res.status(500).json({
       success: false,
       message: "Registration failed",

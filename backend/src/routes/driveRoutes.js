@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { protect } = require("../middleware/authMiddleware");
 
 const {
   getDrives,
@@ -8,9 +9,9 @@ const {
   deleteDrive,
 } = require("../controllers/driveController");
 
-router.get("/", getDrives);
-router.post("/", addDrive);
-router.put("/:id", updateDrive);
-router.delete("/:id", deleteDrive);
+router.get("/", protect, getDrives);
+router.post("/", protect, addDrive);
+router.put("/:id", protect, updateDrive);
+router.delete("/:id", protect, deleteDrive);
 
 module.exports = router;

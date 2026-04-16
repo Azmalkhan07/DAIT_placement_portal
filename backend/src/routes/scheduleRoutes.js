@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { protect } = require("../middleware/authMiddleware");
 
 const {
   getSchedules,
@@ -8,9 +9,9 @@ const {
   deleteSchedule,
 } = require("../controllers/scheduleController");
 
-router.get("/", getSchedules);
-router.post("/", addSchedule);
-router.put("/:id", updateSchedule);
-router.delete("/:id", deleteSchedule);
+router.get("/", protect, getSchedules);
+router.post("/", protect, addSchedule);
+router.put("/:id", protect, updateSchedule);
+router.delete("/:id", protect, deleteSchedule);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { protect } = require("../middleware/authMiddleware");
 const {
   getUsers,
   uploadResume,
@@ -7,8 +8,8 @@ const {
 } = require("../controllers/userController");
 const { resumeUpload, profileUpload } = require("../config/multer");
 
-router.get("/", getUsers);
-router.post("/upload-resume/:id", resumeUpload.single("resume"), uploadResume);
-router.post("/upload-profile/:id", profileUpload.single("profile"), uploadProfileImage);
+router.get("/", protect, getUsers);
+router.post("/upload-resume/:id", protect, resumeUpload.single("resume"), uploadResume);
+router.post("/upload-profile/:id", protect, profileUpload.single("profile"), uploadProfileImage);
 
 module.exports = router;

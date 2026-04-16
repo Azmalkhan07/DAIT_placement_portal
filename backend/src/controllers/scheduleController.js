@@ -5,13 +5,36 @@ const getSchedules = async (req, res) => {
     const schedules = await Schedule.find().sort({ createdAt: -1 });
     res.json(schedules);
   } catch (error) {
+    console.error("Error fetching schedules:", error);
     res.status(500).json({ success: false, message: "Failed to fetch schedules" });
   }
 };
 
 const addSchedule = async (req, res) => {
   try {
-    const schedule = await Schedule.create(req.body);
+    const { title, description, startDate, endDate } = req.body;
+
+    // Input validation
+    if (!title || !startDate || !endDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Title, start date, and end date are required",
+      });
+    }
+
+    if (typeof title !== 'string' || title.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid title",
+      });
+    }
+
+    const schedule = await Schedule.create({
+      title: title.trim(),
+      description: description ? description.trim() : '',
+      startDate,
+      endDate,
+    });
 
     res.json({
       success: true,
@@ -19,6 +42,7 @@ const addSchedule = async (req, res) => {
       schedule,
     });
   } catch (error) {
+    console.error("Error adding schedule:", error);
     res.status(500).json({ success: false, message: "Failed to add schedule" });
   }
 };
@@ -27,7 +51,25 @@ const updateSchedule = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const schedule = await Schedule.findByIdAndUpdate(id, req.body, {
+    // Validate MongoDB ObjectId
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid schedule ID",
+      });
+    }
+
+    // Whitelist allowed fields
+    const allowedFields = ['title', 'description', 'startDate', 'endDate'];
+    const updateData = {};
+    
+    allowedFields.forEach(field => {
+      if (req.body.hasOwnProperty(field) && req.body[field] !== undefined) {
+        updateData[field] = req.body[field];
+      }
+    });
+
+    const schedule = await Schedule.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
     });
@@ -45,6 +87,7 @@ const updateSchedule = async (req, res) => {
       schedule,
     });
   } catch (error) {
+    console.error("Error updating schedule:", error);
     res.status(500).json({ success: false, message: "Failed to update schedule" });
   }
 };
@@ -52,6 +95,14 @@ const updateSchedule = async (req, res) => {
 const deleteSchedule = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Validate MongoDB ObjectId
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid schedule ID",
+      });
+    }
 
     const schedule = await Schedule.findByIdAndDelete(id);
 
@@ -67,6 +118,7 @@ const deleteSchedule = async (req, res) => {
       message: "Schedule deleted successfully",
     });
   } catch (error) {
+    console.error("Error deleting schedule:", error);
     res.status(500).json({ success: false, message: "Failed to delete schedule" });
   }
 };

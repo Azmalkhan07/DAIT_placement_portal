@@ -26,6 +26,7 @@ const getUsers = async (req, res) => {
 
     res.json(users);
   } catch (error) {
+    console.error("Error fetching users:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch users",
@@ -36,6 +37,14 @@ const getUsers = async (req, res) => {
 const uploadResume = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Validate MongoDB ObjectId
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID",
+      });
+    }
 
     if (!req.file) {
       return res.status(400).json({
@@ -65,6 +74,7 @@ const uploadResume = async (req, res) => {
       user,
     });
   } catch (error) {
+    console.error("Error uploading resume:", error);
     res.status(500).json({
       success: false,
       message: "Resume upload failed",
@@ -75,6 +85,14 @@ const uploadResume = async (req, res) => {
 const uploadProfileImage = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Validate MongoDB ObjectId
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID",
+      });
+    }
 
     if (!req.file) {
       return res.status(400).json({
@@ -104,6 +122,7 @@ const uploadProfileImage = async (req, res) => {
       user,
     });
   } catch (error) {
+    console.error("Error uploading profile image:", error);
     res.status(500).json({
       success: false,
       message: "Profile image upload failed",

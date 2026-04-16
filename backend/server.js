@@ -17,7 +17,6 @@ const userRoutes = require("./src/routes/userRoutes");
 const app = express();
 
 connectDB();
-app.use("/api/export", exportRoutes);
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -25,6 +24,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use("/api/export", exportRoutes);
 
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -48,6 +48,20 @@ app.use("/api/users", userRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Please close other applications using this port.`);
+    process.exit(1);
+  } else {
+    throw err;
+  }
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Rejection:', err);
+  process.exit(1);
 });
